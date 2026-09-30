@@ -6,6 +6,21 @@ AI 会按传统六爻（纳甲筮法）的规矩把卦盘装出来并解读给�
 卦象会画成一张标准的六爻盘（六神、六亲、世应、动爻、变卦一应俱全），
 起过的卦会自动存进「卦例库」，以后想回看随时能翻。
 
+> **English** — A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)
+> plugin for traditional Chinese six-line divination (*liuyao*, najia method). Write the
+> question you actually want to ask, click **Cast** once, and the model reads the hexagram
+> for that specific question. The chart is drawn as a standard six-line card in the
+> conversation, and every cast is kept in a local case archive.
+>
+> **Install** — `dsh plugin --profile desktop add dsh-liuyao` (or
+> `github:lctfwyt/dsh-liuyao`), then restart DeepSeek Harness. The cast panel appears above
+> the message box, collapsed to one line by default.
+>
+> **Note** — the plugin's own panel labels are Chinese-only for now; the model answers in
+> whatever language you ask in, so asking in English works fine.
+>
+> Traditional culture reference only — not advice of any kind.
+
 ---
 
 ## 它能帮你做什么
