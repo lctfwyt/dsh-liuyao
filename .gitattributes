@@ -1,0 +1,13 @@
+# 统一换行：仓库内一律 LF，检出时不因平台改写。
+# 这个插件同时面向 Windows / macOS / Linux 用户，且发布到 npm，
+# 统一 LF 可以避免 Windows 检出后出现大量 "LF will be replaced by CRLF" 噪音，
+# 也让跨平台 diff 保持稳定。
+* text=auto eol=lf
+
+# 明确二进制，避免被当文本处理。
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary

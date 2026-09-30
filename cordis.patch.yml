@@ -1,0 +1,19 @@
+# ============================================================================
+# dsh-liuyao —— DSH bundle patch（挂载声明）
+# ============================================================================
+# 本文件是插件的「挂载声明」。DSH 启动时按 bundle 层栈叠加各插件 patch，
+# 下面的 insert 行把 Host 半边插入 profile 的配置树。
+#
+# 同一行的包名同时挂载两个半边：
+#   - Host：package.json 的 "main" → lib/index.js
+#           （注册 liuyao_cast / liuyao_cases 工具、liuyao-divination 技能、卦例路由）
+#   - Client：package.json 的 "dsh.client" → exports["./client"] → lib/client.js
+#           （起卦 dock / 卦盘卡片 / 卦例库）
+#
+# 装完需要重启 DSH 才会生效。
+# 安装与卸载方式见 README.md；技术说明见 docs/DEVELOPMENT.md。
+# ============================================================================
+
+- insert:
+    - id: liuyao
+      name: dsh-liuyao

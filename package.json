@@ -1,0 +1,66 @@
+{
+  "name": "dsh-liuyao",
+  "version": "0.1.0",
+  "description": "六爻起卦 · AI 解卦 — DSH 插件：一键起卦、京房纳甲装卦、按所问具体事项断卦，附卦盘卡片与卦例库",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "liuyao",
+    "六爻",
+    "纳甲",
+    "易经",
+    "divination"
+  ],
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./locale/*.json": "./locale/*.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "locale/*.json",
+    "cordis.patch.yml",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node tools/run-tests.mjs",
+    "check:client": "node tools/check-client.mjs",
+    "check": "node tools/check-client.mjs && node tools/run-tests.mjs",
+    "prepublishOnly": "npm run check"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-api-session-controller",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-renderer",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-tool"
+      ]
+    }
+  },
+  "license": "MIT",
+  "author": "dsh-liuyao contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lctfwyt/dsh-liuyao.git"
+  },
+  "homepage": "https://github.com/lctfwyt/dsh-liuyao#readme",
+  "bugs": {
+    "url": "https://github.com/lctfwyt/dsh-liuyao/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
