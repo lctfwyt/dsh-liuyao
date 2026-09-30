@@ -12,9 +12,10 @@ AI 会按传统六爻（纳甲筮法）的规矩把卦盘装出来并解读给�
 > for that specific question. The chart is drawn as a standard six-line card in the
 > conversation, and every cast is kept in a local case archive.
 >
-> **Install** — `dsh plugin --profile desktop add dsh-liuyao` (or
-> `github:lctfwyt/dsh-liuyao`), then restart DeepSeek Harness. The cast panel appears above
-> the message box, collapsed to one line by default.
+> **Install** — add `dsh-liuyao` (or `github:lctfwyt/dsh-liuyao`) in the Plugins page, or
+> `dsh plugin --profile desktop add dsh-liuyao` from a shell (use `--profile web` if you
+> run `dsh web`). Then restart DeepSeek Harness — the desktop app has no page refresh.
+> The cast panel sits above the message box, collapsed to one line by default.
 >
 > **Note** — the plugin's own panel labels are Chinese-only for now; the model answers in
 > whatever language you ask in, so asking in English works fine.
@@ -41,9 +42,9 @@ AI 会按传统六爻（纳甲筮法）的规矩把卦盘装出来并解读给�
 
 ## 安装
 
-> 前提：你已经装好了 DeepSeek Harness 桌面版。
+> 前提：你已经装好了 DeepSeek Harness。
 
-装完**必须重启 DeepSeek Harness**，然后刷新页面，输入框上方就会出现「六爻起卦」面板。
+装完需要**重启对应的客户端**，输入框上方才会出现「六爻起卦」面板。
 
 ### 方式一：从 npm 安装（推荐）
 
@@ -66,14 +67,25 @@ github:lctfwyt/dsh-liuyao
 ### 方式三：命令行
 
 ```bash
+# 桌面版
 dsh plugin --profile desktop add dsh-liuyao
-# 或从 GitHub：
-dsh plugin --profile desktop add github:lctfwyt/dsh-liuyao
+
+# dsh web 起的网页版
+dsh plugin --profile web add dsh-liuyao
 ```
 
-> 注意 `--profile` 要写 **`desktop`**（桌面版实际使用的 profile）。
+从 GitHub 安装同理，把 `dsh-liuyao` 换成 `github:lctfwyt/dsh-liuyao` 即可。
 
-装完第一次看不到面板时，先刷新页面（F5）；还是不行就确认重启有没有做。
+> **`--profile` 要和你用的客户端对上**：桌面版是 `desktop`，`dsh web` 起的网页版是 `web`。
+> 写错了不会报错，但那个客户端永远不会加载这个插件——这是最容易踩的坑。
+
+### 装完看不到面板？
+
+- **桌面版**：桌面端没有刷新页面这回事，**重启 DeepSeek Harness**（完全退出再启动）。
+- **网页版**：先按 **F5 刷新页面**；还是看不到，再重启 `dsh web`。
+
+面板本身也不占地方：它默认**收起**成输入框上方的一行 `▸ 六爻起卦`，
+别只在聊天区找。
 
 ---
 
@@ -147,8 +159,9 @@ AI 会自己完成起卦和解读，并把卦盘画出来。
 ## 常见问题
 
 **装好了但看不到面板？**
-先找一下 `▸ 六爻起卦` 那一行（在输入框上方，默认收起，可能只有一行）；
-再刷新页面（F5）；还是没有就重启一次 DeepSeek Harness。
+先找一下 `▸ 六爻起卦` 那一行——它在输入框上方、默认收起，别只在聊天区找。
+还是没有，就按 [「装完看不到面板？」](#装完看不到面板) 里的排查走一遍：
+桌面版重启应用，网页版先 F5 再考虑重启服务；另外确认 `--profile` 用的是你正在用的那个客户端。
 
 **点了「一键起卦」没反应？**
 检查有没有先写下问题——问题为空时不会起卦，面板里会提示「请先写下所问之事」。

@@ -293,18 +293,29 @@ node tools/snapshot-theme-tokens.mjs "D:\path\to\DeepSeek Harness\resources\app.
 
 ### 6.1 安装（面向用户，三种等价方式）
 
-装进**桌面版实际使用的 profile**（`desktop`），否则桌面版不会加载。
+装进**你实际使用的那个客户端的 profile**，否则它永远不加载这个插件。
 
 ```bash
+# 桌面版
 dsh plugin --profile desktop add dsh-liuyao                        # npm
 dsh plugin --profile desktop add github:lctfwyt/dsh-liuyao         # GitHub 主干
 dsh plugin --profile desktop add github:lctfwyt/dsh-liuyao#v0.1.0  # 指定 tag
+
+# dsh web 起的网页版
+dsh plugin --profile web add dsh-liuyao
 ```
 
-也可以直接用桌面版的**插件 → 添加插件**界面填 `dsh-liuyao` 或
-`github:lctfwyt/dsh-liuyao`。装完**重启 DSH**。
+也可以在**插件 → 添加插件**界面填 `dsh-liuyao` 或 `github:lctfwyt/dsh-liuyao`。
 
-> `--profile` 必须写 `desktop`。写成别的 profile 名，命令会"成功"但桌面版永远不加载它。
+> **`--profile` 必须与客户端对应**：桌面版 → `desktop`，`dsh web` → `web`。
+> 写错了命令会"成功"，但那个客户端永远不会加载它——这是最常踩的坑。
+
+**让改动生效的方式按客户端不同**：
+
+| 客户端 | 装完 / 改完之后 |
+| --- | --- |
+| 桌面版 | **重启 DeepSeek Harness**。桌面端没有刷新页面这一操作 |
+| `dsh web` 网页版 | 先 **F5 刷新页面**；仍是旧的，再重启 `dsh web` 服务 |
 
 ### 6.2 发布
 
@@ -329,10 +340,12 @@ npm pack --dry-run
 
 | 改了什么 | 生效方式 |
 | --- | --- |
-| `lib/client.js`（界面、样式） | `dsh-client-hmr` 已挂载，经 SSE 自动热换 bundle；没换过来就刷新页面。**不需要重启** |
-| `lib/index.js`、`lib/tools.js`、`lib/engine/*`、`lib/doctrine.*` | 需要**重启 DSH**（`dsh-hmr` 的 `config.root` 默认空，不监听源码模块） |
-| `package.json` | 需要**重启 DSH** |
-| `locale/*.json`（插件页展示文案） | 每次读文件、无缓存，**刷新插件页即可** |
+| `lib/client.js`（界面、样式） | `dsh-client-hmr` 已挂载，经 SSE 自动热换 bundle。**不需要重启**；网页版换不过来就 F5，桌面版没有刷新操作、等 HMR 或重启 |
+| `lib/index.js`、`lib/tools.js`、`lib/engine/*`、`lib/doctrine.*` | 需要**重启客户端**（`dsh-hmr` 的 `config.root` 默认空，不监听源码模块） |
+| `package.json` | 需要**重启客户端** |
+| `locale/*.json`（插件页展示文案） | 每次读文件、无缓存，**重新打开插件页即可**（网页版可 F5） |
+
+「重启客户端」= 桌面版重启 DeepSeek Harness；网页版重启 `dsh web` 服务。
 
 > 维护者提示（不在用户文档中展开）：从 npm/GitHub 装的是包的副本，改工作树不会影响已装的那份。
 > 想改一次立刻见效，可以把工作树以 `link:` 形式接进 profile 的 `node_modules`；
