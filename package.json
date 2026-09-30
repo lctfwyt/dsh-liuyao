@@ -1,7 +1,7 @@
 {
   "name": "dsh-liuyao",
   "version": "0.1.0",
-  "description": "六爻起卦 · AI 解卦 — DSH 插件：一键起卦、京房纳甲装卦、按所问具体事项断卦，附卦盘卡片与卦例库",
+  "description": "Six-Line Divination (liuyao) for DeepSeek Harness — one-click casting, eight-palace najia chart, AI interpretation, chart card and case archive. 六爻起卦 · AI 解卦：一键起卦、纳甲装卦、按所问事项断卦。",
   "keywords": [
     "dsh",
     "dsh-plugin",
