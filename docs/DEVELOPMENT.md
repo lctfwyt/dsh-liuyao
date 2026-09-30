@@ -299,7 +299,7 @@ node tools/snapshot-theme-tokens.mjs "D:\path\to\DeepSeek Harness\resources\app.
 # 桌面版
 dsh plugin --profile desktop add dsh-liuyao                        # npm
 dsh plugin --profile desktop add github:lctfwyt/dsh-liuyao         # GitHub 主干
-dsh plugin --profile desktop add github:lctfwyt/dsh-liuyao#v0.1.0  # 指定 tag
+dsh plugin --profile desktop add github:lctfwyt/dsh-liuyao#v0.1.1  # 指定 tag
 
 # dsh web 起的网页版
 dsh plugin --profile web add dsh-liuyao
