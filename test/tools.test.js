@@ -14,6 +14,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 
 import { createArchive } from '../lib/archive.js';
+import { DEFAULT_DAY_BOUNDARY } from '../lib/engine/calendar.js';
 import {
   DEFAULT_TIME_ZONE,
   TOOL_CAST,
@@ -220,8 +221,28 @@ test('liuyao_cast：参数非法时抛出可读错误', async (t) => {
   await assert.rejects(() => tool.execute({ question: 'x', method: '看卦' }), /method 必须是/);
   await assert.rejects(() => tool.execute({ question: 'x', method: 'lines' }), /长度 6 的数组/);
   await assert.rejects(() => tool.execute({ question: 'x', method: 'lines', lines: [1, 2, 3, 4, 5, 6] }), /lines\[0\]/);
-  await assert.rejects(() => tool.execute({ question: 'x', method: 'coins', dayBoundary: 'noon' }), /dayBoundary/);
   await assert.rejects(() => tool.execute({ question: 'x', method: 'coins', at: '不是时间' }), /无法识别/);
+});
+
+test('liuyao_cast：换日口径不下发，传入也被忽略', async (t) => {
+  const { byName } = setup(t);
+  const tool = byName[TOOL_CAST];
+  assert.equal(Object.hasOwn(tool.parameters.properties, 'dayBoundary'), false);
+  assert.equal(tool.description.includes('子正'), false);
+
+  const instant = '2024-06-15T23:30:00+08:00';
+  for (const injected of ['midnight', 'noon', 'ziShi']) {
+    const value = await tool.execute({
+      question: 'x',
+      method: 'lines',
+      lines: [7, 7, 7, 7, 7, 7],
+      at: instant,
+      dayBoundary: injected,
+    });
+    assert.equal(value.chart.calendar.dayBoundary, DEFAULT_DAY_BOUNDARY);
+    assert.equal(value.chart.calendar.dayPillar, '辛亥');
+    assert.equal(value.chart.calendar.dayRolled, true);
+  }
 });
 
 test('liuyao_cases：list / get / delete / clear', async (t) => {

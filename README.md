@@ -62,7 +62,7 @@ dsh-liuyao
 github:lctfwyt/dsh-liuyao
 ```
 
-想装某个具体版本就带上 tag，例如 `github:lctfwyt/dsh-liuyao#v0.1.1`。
+想装某个具体版本就带上 tag，例如 `github:lctfwyt/dsh-liuyao#v0.2.0`。
 
 ### 方式三：命令行
 

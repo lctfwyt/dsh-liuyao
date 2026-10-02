@@ -248,8 +248,14 @@ loader 在 HMR 卸载时清理）。按官方 practices，**不 import
 六合八卦 = 否/泰/困/节/旅/贲/豫/复），可作为纳甲表的交叉校验。
 另给三合局（全卦与动爻分别标注）、游魂、归魂、月破、暗动、日破。
 
-**口径选择**（流派有差异处）：月建按节气、日辰默认子正换日（可切 `ziShi`）、
+**口径选择**（流派有差异处）：月建按节气、日辰以子时换日（23:00 起算次日）、
 旬空按日柱、应期只给区间、六神只加色彩不定吉凶。这些在 `lib/doctrine.md` 里对模型也是明示的。
+
+`dayBoundary`（`'ziShi' | 'midnight'`）定义在 `lib/engine/calendar.js`，`buildChart` 与
+`buildCalendar` 的缺省都引用同一个 `DEFAULT_DAY_BOUNDARY`；`liuyao_cast` 的 JSON Schema 不含
+该参数，模型与前端都无从切换。子时换日下 23:00 之后起卦时卦盘给出 `civilEffectiveDay`
+（换日后的有效日期）与 `dayRolled:true`，展示层的「起卦」行仍打印当地钟面时间，
+两者不一致属正常。
 
 ---
 
@@ -257,7 +263,7 @@ loader 在 HMR 卸载时清理）。按官方 practices，**不 import
 
 ```bash
 node tools/check-client.mjs   # 离线加载客户端 bundle，断言包装/id/导出/注册调用/表一致性
-node tools/run-tests.mjs      # 92 个单测
+node tools/run-tests.mjs      # 101 个单测
 ```
 
 > 为什么不用 `node --test`：`node --test` 会为每个测试文件 spawn 子进程，
@@ -299,7 +305,7 @@ node tools/snapshot-theme-tokens.mjs "D:\path\to\DeepSeek Harness\resources\app.
 # 桌面版
 dsh plugin --profile desktop add dsh-liuyao                        # npm
 dsh plugin --profile desktop add github:lctfwyt/dsh-liuyao         # GitHub 主干
-dsh plugin --profile desktop add github:lctfwyt/dsh-liuyao#v0.1.1  # 指定 tag
+dsh plugin --profile desktop add github:lctfwyt/dsh-liuyao#v0.2.0  # 指定 tag
 
 # dsh web 起的网页版
 dsh plugin --profile web add dsh-liuyao

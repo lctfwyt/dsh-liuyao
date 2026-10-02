@@ -6,6 +6,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import {
+  DAY_BOUNDARIES,
+  DEFAULT_DAY_BOUNDARY,
   buildCalendar,
   civilFromJdn,
   civilTimeOf,
@@ -94,7 +96,7 @@ test('四柱组装：2024-06-15 12:00 CST', () => {
   assert.equal(calendar.dayBranch, '戌');
   assert.equal(calendar.xun, '甲辰');
   assert.deepEqual(calendar.xunKong, ['寅', '卯']);
-  assert.equal(calendar.dayBoundary, 'midnight');
+  assert.equal(calendar.dayBoundary, DEFAULT_DAY_BOUNDARY);
   assert.equal(calendar.timeZone, 'Asia/Shanghai');
 });
 
@@ -114,13 +116,47 @@ test('临近交节时给出临界标记', () => {
   assert.equal(close.monthBranch, '寅');
 });
 
-test('子时换日口径可切换', () => {
+test('默认口径是子时换日（不传 dayBoundary）', () => {
+  const instant = CST('2024-06-15T23:30:00+08:00');
+  const calendar = buildCalendar({ instant });
+  // 2024-06-15 为庚戌日，次日为辛亥日；子时换日下 23:00 已属次日。
+  assert.equal(calendar.dayPillar, '辛亥');
+  assert.equal(calendar.dayBoundary, DEFAULT_DAY_BOUNDARY);
+  assert.equal(calendar.dayPillar, buildCalendar({ instant, dayBoundary: 'ziShi' }).dayPillar);
+  assert.notEqual(calendar.dayPillar, buildCalendar({ instant, dayBoundary: 'midnight' }).dayPillar);
+  assert.equal(calendar.dayRolled, true);
+  assert.deepEqual(calendar.civilEffectiveDay, { year: 2024, month: 6, day: 16 });
+  // 时支仍是子时，时干按新日干（辛）用五鼠遁。
+  assert.equal(calendar.hourBranch, '子');
+  assert.equal(calendar.hourPillar, '戊子');
+});
+
+test('子时换日：跨午夜两侧落在同一天', () => {
+  const late = buildCalendar({ instant: CST('2024-06-15T23:30:00+08:00') });
+  const early = buildCalendar({ instant: CST('2024-06-16T00:30:00+08:00') });
+  assert.equal(late.dayPillar, early.dayPillar);
+  assert.equal(late.hourPillar, early.hourPillar);
+  assert.equal(late.dayPillar, '辛亥');
+  assert.equal(early.dayRolled, false);
+  assert.deepEqual(early.civilEffectiveDay, { year: 2024, month: 6, day: 16 });
+});
+
+test('子时换日：月末能正确进位', () => {
+  const calendar = buildCalendar({ instant: CST('2024-06-30T23:30:00+08:00') });
+  assert.deepEqual(calendar.civilEffectiveDay, { year: 2024, month: 7, day: 1 });
+  assert.equal(calendar.dayRolled, true);
+  assert.equal(calendar.dayPillarIndex, dayPillarIndex(jdnOf(2024, 7, 1)));
+});
+
+test('两种换日口径可切换', () => {
   const instant = CST('2024-06-15T23:30:00+08:00');
   const midnight = buildCalendar({ instant, dayBoundary: 'midnight' });
   const ziShi = buildCalendar({ instant, dayBoundary: 'ziShi' });
   // 2024-06-15 为庚戌日，次日为辛亥日。
   assert.equal(midnight.dayPillar, '庚戌');
   assert.equal(ziShi.dayPillar, '辛亥');
+  assert.equal(midnight.dayRolled, false);
+  assert.equal(ziShi.dayRolled, true);
   // 时支两种口径都是子时（晚子时）。
   assert.equal(midnight.hourBranch, '子');
   assert.equal(ziShi.hourBranch, '子');
@@ -130,6 +166,16 @@ test('子时换日口径可切换', () => {
     buildCalendar({ instant: afternoon, dayBoundary: 'midnight' }).dayPillar,
     buildCalendar({ instant: afternoon, dayBoundary: 'ziShi' }).dayPillar,
   );
+  assert.equal(buildCalendar({ instant: afternoon }).dayRolled, false);
+});
+
+test('dayBoundary 非法值抛错', () => {
+  const instant = CST('2024-06-15T12:00:00+08:00');
+  assert.throws(() => buildCalendar({ instant, dayBoundary: 'noon' }), /dayBoundary/);
+  assert.deepEqual([...DAY_BOUNDARIES].sort(), ['midnight', 'ziShi']);
+  for (const value of DAY_BOUNDARIES) {
+    assert.doesNotThrow(() => buildCalendar({ instant, dayBoundary: value }));
+  }
 });
 
 test('四柱干支都落在六十甲子之内', () => {
