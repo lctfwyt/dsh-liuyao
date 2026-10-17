@@ -23,7 +23,13 @@ export const PACKAGE_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 /** bundle 期望的插件 id（必须等于包名，否则 boot 图里找不到）。 */
 export const EXPECTED_ID = 'dsh-liuyao';
 
-/** 客户端 bundle 允许 require 的 DSH seed 模块（前端 `function rM()` 的完整列表）。 */
+/**
+ * 客户端 bundle 允许 require 的 DSH seed 模块。
+ *
+ * 取值来自前端产物的 seed 注册表：0.2.0-rc.2 是 `function rM()`（9 项），
+ * 0.2.1-rc.2 改名 `SZ()` 并追加 `zod` 与 `@tanstack/react-virtual`（11 项），
+ * 原 9 项 specifier 一字未改。这里存的是两版并集；`lib/client.js` 只用 `react`。
+ */
 export const SEED_SPECIFIERS = [
   'react',
   'react/jsx-runtime',
@@ -34,6 +40,9 @@ export const SEED_SPECIFIERS = [
   '@deepseek-ai/dsh-client-ui-slots',
   '@deepseek-ai/dsh-client-ui-primitives',
   '@deepseek-ai/dsh-client-ui-dockkit',
+  // 0.2.1-rc.2 新增；require 它们等于要求 DSH >= 0.2.1-rc.2。
+  'zod',
+  '@tanstack/react-virtual',
 ];
 
 /** 极简 React 替身：够跑通组件定义与 `apply`，不渲染。 */

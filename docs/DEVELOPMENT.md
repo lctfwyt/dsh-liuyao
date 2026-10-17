@@ -160,10 +160,13 @@ window.__ModuleLoader__.load({
 ```
 
 - `factory` 的**返回值**就是模块导出；`apply` 是 cordis 插件体。
-- `require()` 只能解析 DSH 的 9 个 seed 模块（`react`、`react/jsx-runtime`、
-  `react-dom`、`react-dom/client`、`@deepseek-ai/cordis`、`dsh-client-store`、
-  `dsh-client-ui-slots`、`dsh-client-ui-primitives`、`dsh-client-ui-dockkit`），
-  以及已在 boot 图中的插件包（需写进 `dsh.client.external`）。
+- `require()` 只能解析 DSH 的 seed 模块。0.2.0-rc.2 是 9 个（`react`、
+  `react/jsx-runtime`、`react-dom`、`react-dom/client`、`@deepseek-ai/cordis`、
+  `dsh-client-store`、`dsh-client-ui-slots`、`dsh-client-ui-primitives`、
+  `dsh-client-ui-dockkit`）；0.2.1-rc.2 追加 `zod`、`@tanstack/react-virtual`，
+  原 9 项 specifier 一字未改。权威列表见 `tools/check-client.mjs` 的
+  `SEED_SPECIFIERS`。此外还能 require 已在 boot 图中的插件包（需写进
+  `dsh.client.external`）。
 - 所以本文件**不能 import 引擎**（`lib/engine/*` 是 ESM，浏览器半边拿不到）。
   客户端需要的常量表（六十四卦名、八卦三爻）在 `lib/client.js` 里各存一份，
   由 `test/client.test.js` **逐项断言**两边一致，表一漂就红。
@@ -293,6 +296,28 @@ node tools/snapshot-theme-tokens.mjs "D:\path\to\DeepSeek Harness\resources\app.
 # 或设置 DSH_ASAR 环境变量；不传参时会尝试 %LOCALAPPDATA% 与 %PROGRAMFILES% 下的常见位置
 ```
 
+### 5.1 DSH 升级后怎么核对
+
+升级 DSH 后核四件事：
+
+1. 跑 `npm run check`。
+2. 重抓主题 token 快照（上一条命令），看 `test/dsw-theme-tokens.json` 是否飘。
+3. 核 **seed 模块清单**：前端产物 `dsh-web-frontend/dist/assets/index-*.js` 里的 seed 注册表
+   （形如 `function <压缩名>(){return{react:…}}`）要与 `tools/check-client.mjs` 的
+   `SEED_SPECIFIERS` 对齐。它每次升级都可能在尾部追加（0.2.1 由 9 项加到 11 项），
+   而压缩函数名会随构建变动——那是噪声，不是契约，别写进注释当依据。
+4. 核插件实际用到的接缝：`ctx.tools.register`、`ctx.skills.register`、`ctx.webServer.register`、
+   `conversation.input.dock`、`tool.call.toolview`、`ctx.locale.register`。
+
+0.2.0-rc.2 → 0.2.1-rc.2 核过一遍，结论是**破坏 0 条**：两侧接缝的宿主实现逐字节相同，
+seed 只加了 `zod` 与 `@tanstack/react-virtual`，而本插件只 `require('react')`。
+逐项证据与实测记录**不入库**，在 `.scratch/dsh-0.2.1-reports/`（已 gitignore）。
+
+**别顺手给 `package.json` 加 `engines.dsh`。** DSH 启动时据此判断插件兼容性
+（0.2.1 起只认它，同时写了就忽略 `@deepseek-ai/dsh*` 形式的 peerDeps），不满足会警告并拒装。
+本插件两者都不声明，所以闸门不触发——但**「闸门放行」不等于「已验证兼容」**，
+只是免了随每个 DSH 版本维护版本区间这件事。
+
 ---
 
 ## 6. 安装、发布与开发回路
@@ -305,7 +330,7 @@ node tools/snapshot-theme-tokens.mjs "D:\path\to\DeepSeek Harness\resources\app.
 # 桌面版
 dsh plugin --profile desktop add dsh-liuyao                        # npm
 dsh plugin --profile desktop add github:lctfwyt/dsh-liuyao         # GitHub 主干
-dsh plugin --profile desktop add github:lctfwyt/dsh-liuyao#v0.2.0  # 指定 tag
+dsh plugin --profile desktop add github:lctfwyt/dsh-liuyao#v0.2.1  # 指定 tag
 
 # dsh web 起的网页版
 dsh plugin --profile web add dsh-liuyao
@@ -315,6 +340,10 @@ dsh plugin --profile web add dsh-liuyao
 
 > **`--profile` 必须与客户端对应**：桌面版 → `desktop`，`dsh web` → `web`。
 > 写错了命令会"成功"，但那个客户端永远不会加载它——这是最常踩的坑。
+> 反过来，**列在 profile 依赖里 ≠ 会被加载**：插件还必须在 profile 的
+> `dsh.profile.bundles` 里。升级后插件突然不出现就先查这里——单独把
+> `cordis.patch.yml` 的 `enabled` 改成 `true` 不管用，会报
+> `patch: entry "<id>" not found`。
 
 **让改动生效的方式按客户端不同**：
 
@@ -377,7 +406,7 @@ npm pack --dry-run
 `%LOCALAPPDATA%`、`%USERPROFILE%\.dsh`、`$env:DSH_HOME`。
 
 **已忽略**（见 `.gitignore`）：`backup/`（profile 备份与配置转储）、
-`test/.tmp/`、`node_modules/`、日志与编辑器产物。
+`.scratch/`（调研与审计临时产物、解包对照树）、`test/.tmp/`、`node_modules/`、日志与编辑器产物。
 
 **入库前自检**：
 
@@ -393,7 +422,7 @@ $needles = @(
   ('AppData' + '\\Local')
 )
 Get-ChildItem -Recurse -File |
-  Where-Object { $_.FullName -notmatch '\\node_modules\\|\\.git\\|\\backup\\|\\test\\.tmp\\' } |
+  Where-Object { $_.FullName -notmatch '\\node_modules\\|\\.git\\|\\backup\\|\\.scratch\\|\\test\\.tmp\\' } |
   Select-String -Pattern $needles |
   Select-Object Path, LineNumber, Line
 ```
