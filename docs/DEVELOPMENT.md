@@ -32,7 +32,7 @@ lib/
     cast.js           三钱法取爻（随机源可注入）
     chart.js          装卦组装（含变爻、格局）
     format.js         卦盘 → 模型可读 Markdown
-test/                 92 个单测
+test/                 101 个单测
   dsw-theme-tokens.json   DSH 主题 token 快照（供样式契约测试）
 tools/
   check-client.mjs          离线加载并校验客户端 bundle
@@ -164,7 +164,7 @@ window.__ModuleLoader__.load({
   `react/jsx-runtime`、`react-dom`、`react-dom/client`、`@deepseek-ai/cordis`、
   `dsh-client-store`、`dsh-client-ui-slots`、`dsh-client-ui-primitives`、
   `dsh-client-ui-dockkit`）；0.2.1-rc.2 追加 `zod`、`@tanstack/react-virtual`，
-  原 9 项 specifier 一字未改。权威列表见 `tools/check-client.mjs` 的
+  原 9 项 specifier 一字未改（0.2.2-rc.1 复核仍是这 11 项，未再追加）。权威列表见 `tools/check-client.mjs` 的
   `SEED_SPECIFIERS`。此外还能 require 已在 boot 图中的插件包（需写进
   `dsh.client.external`）。
 - 所以本文件**不能 import 引擎**（`lib/engine/*` 是 ESM，浏览器半边拿不到）。
@@ -311,7 +311,17 @@ node tools/snapshot-theme-tokens.mjs "D:\path\to\DeepSeek Harness\resources\app.
 
 0.2.0-rc.2 → 0.2.1-rc.2 核过一遍，结论是**破坏 0 条**：两侧接缝的宿主实现逐字节相同，
 seed 只加了 `zod` 与 `@tanstack/react-virtual`，而本插件只 `require('react')`。
-逐项证据与实测记录**不入库**，在 `.scratch/dsh-0.2.1-reports/`（已 gitignore）。
+0.2.1-rc.2 → 0.2.2-rc.1 也核过一遍（**未发版**），结论仍是**破坏 0 条**：6 个接缝的宿主实现未变
+（`dsh-client-ui-renderer`、`dsh-client-hmr` 逐字节相同，`dsh-skill` 相同），seed 仍为这 11 项，
+主题 token 新增 3 个且只增不减（`--dsw-alias-bg-skeleton`、`--dsw-radius-xl`、`--dsw-specific-bubble`，
+快照已刷新）；端到端实测插件在 0.2.2 正常加载、只读路由与客户端注册均成功。
+逐项证据与实测记录**不入库**，在 `.scratch/dsh-0.2.1-reports/` 与 `.scratch/dsh-0.2.2-reports/`（已 gitignore）。
+
+**核对 ≠ 发版。** DSH 升级时只做上面四项核对（以及可选的快照刷新），**不随之发版、不改插件版本号**：
+本插件不声明 `engines.dsh`，新 DSH 上照常安装加载；接缝稳定时同一个已发布版本可跨多个 DSH 版本工作。
+只有当插件本身有**用户可感知的变化**（新功能、缺陷修复，或真遇到破坏性变更被迫适配）时才发版。
+「已核对过哪些 DSH 版本」这类信息记在这里（上文变更记录）或 README 的兼容矩阵，而不是靠版本号同步——
+版本号与 DSH 版本号解耦，避免每次 DSH 升级都给使用者推一个无功能变化的版本。
 
 **别顺手给 `package.json` 加 `engines.dsh`。** DSH 启动时据此判断插件兼容性
 （0.2.1 起只认它，同时写了就忽略 `@deepseek-ai/dsh*` 形式的 peerDeps），不满足会警告并拒装。

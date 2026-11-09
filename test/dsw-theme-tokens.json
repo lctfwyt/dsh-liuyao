@@ -1,6 +1,6 @@
 {
   "note": "DSH Web 前端 dist/*.css 里出现的全部 --dsw-* 主题 token（快照）。client.js 只允许使用这张表里的 token；用到表外 token 视为笔误，测试会失败。",
-  "source": "assets/index-BPHePDI_.css + assets/vendor-BNsW4eBh.css",
+  "source": "assets/index-lh_YM6sT.css + assets/vendor-DV2921Zo.css",
   "capturedFrom": "DeepSeek Harness app.asar",
   "tokens": [
     "--dsw-alias-bg-base",
@@ -10,6 +10,7 @@
     "--dsw-alias-bg-layer-4",
     "--dsw-alias-bg-mask-1",
     "--dsw-alias-bg-module-platform",
+    "--dsw-alias-bg-skeleton",
     "--dsw-alias-border-l1",
     "--dsw-alias-border-l2",
     "--dsw-alias-border-l2-darkmode-thin",
@@ -85,8 +86,10 @@
     "--dsw-radius-md",
     "--dsw-radius-panel",
     "--dsw-radius-sm",
+    "--dsw-radius-xl",
     "--dsw-radius-xs",
     "--dsw-shadow-lv3",
+    "--dsw-specific-bubble",
     "--dsw-specific-input-major",
     "--dsw-specific-menu",
     "--dsw-static-amber-400",
